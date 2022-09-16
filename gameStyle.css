@@ -1,0 +1,167 @@
+/* All */
+html {
+box-sizing: border-box;
+min-height: -webkit-fill-available;
+min-width: -webkit-fill-available;
+}
+
+body {
+background-color: #C14B76;
+background-image: url("./assets/img/bkgd-tex.png");
+background-repeat: repeat;
+}
+
+/* Scene & Controller */
+#aframeController {
+height: -webkit-fill-available;
+}
+
+/* A-Frame Block */
+#aframeBlock{
+}
+
+#controllerMask {
+overflow: hidden;
+position: absolute;
+bottom: 0;
+width: 100%;
+height: 43%;
+}
+/* Mobile HTML Controller Block */
+#controllerBlock {
+display: flex;
+flex-direction: column;
+position: absolute;
+width: 100%;
+height: 100%;
+}
+
+#directional-buttons{
+flex-direction: row;
+justify-content: center;
+transform: rotate(45deg);
+width: 100%;
+height: 100%;
+}
+
+#leftRight {
+position: absolute;
+bottom: 0;
+}
+
+#upDown {
+position: absolute;
+bottom: 0;
+}
+
+#start-select-buttons{
+height: 20%;
+position: absolute;
+}
+
+.column {
+display: flex;
+flex-direction: column;
+justify-content: space-around;
+}
+
+.row {
+display: flex;
+flex-direction: row;
+justify-content: space-around;
+}
+
+.col1 {
+justify-content: space-around;
+}
+
+.col2 {
+justify-content: flex-end;
+margin-bottom: 1rem;
+}
+
+.col3 {
+justify-content: center;
+}
+
+.directions{
+display: flex;
+justify-content: center;
+}
+
+.startselect{
+display: flex;
+justify-content: center;
+
+}
+
+button {
+background-color: transparent;
+color: #e5e2e2;
+cursor: pointer;
+display: inline-block;
+font-size: 25em;
+font-weight: 900;
+height: 3.5em;
+letter-spacing: 0.35em;
+overflow: hidden;
+padding: 1em 2em 1em 2.5em;
+text-align: center;
+text-decoration: none;
+text-overflow: ellipsis;
+white-space: nowrap;
+}
+
+button.menu{
+font-size: 0.5em;
+}
+
+
+button.up {
+border-right: 0;
+}
+
+button.right {
+border-top: 0;
+}
+
+button.down {
+border: 0 0 0 1em;
+}
+
+button.left {
+border-bottom: 0;
+}
+
+button.hide {
+border: 0;
+}
+
+.a-enter-vr{
+z-index: 100;
+position: fixed!important;
+font-size: 1px;
+}
+
+.a-enter-vr-button{
+
+}
+
+#beginDiv{
+position: absolute;
+z-index: 1000;
+background-color: #1500fa;
+padding: 1.75em;
+display: flex;
+flex-direction: column;
+list-style: disclosure-closed;
+top: 50%;
+left: 50%;
+-ms-transform: translate(-50%, -50%);
+transform: translate(-50%, -50%);
+border-radius: 15%;
+}
+
+#beginDiv li{
+margin-bottom: 0.5em;
+}

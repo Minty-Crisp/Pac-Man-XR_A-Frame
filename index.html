@@ -1,0 +1,934 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<title>Pac-Man XR (A-Frame) | Minty Crisp</title>
+<link rel="icon" type="image/png" sizes="16x16" crossorigin="anonymous" href="./assets/img/favicon.ico"/>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+<!-- Search Info -->
+<meta name="description" content="Pac-Man XR (A-Frame) | Minty Crisp">
+<meta name="keywords" content="A-Frame,aframe,xr,webxr,vr,webvr,ar, webar,html,css,javascript,3d,blender,prototype,prototypes,virtual,reality,virtualreality,animation,animations,articles,blog,minty,crisp,mintycrisp,minty-crisp,minty_crisp,pacman,pac-man,clone,retro,arcade,game,remake,open,open-sourced,sourced">
+<!-- Social Media Share -->
+<meta property="og:title" content="Pac-Man XR (A-Frame) | Minty Crisp">
+<meta property="og:type" content="XR">
+<meta property="og:url" content="mintycrisp.com">
+<meta property="og:image" content="assets/img/pac-man-icon.png">
+<!-- A-Frame official release 1.3.0 -->
+<script src="https://aframe.io/releases/1.3.0/aframe.min.js"></script>
+</head>
+<!-- Template CSS -->
+<link rel="stylesheet" href="assets/css/template.css" />
+<!-- Game CSS -->
+<link rel="stylesheet" href="gameStyle.css" />
+<!-- JS -->
+<script src="gameControl.js"></script>
+
+<!-- Body -->
+<body class="">
+
+<!-- Header -->
+<header id="header">
+<div class="inner">
+<!-- Nav -->
+<nav id="navBlock">
+	<ul>
+		<li><a href="#menu">Menu</a></li>
+	</ul>
+</nav>
+</div>
+</header>
+
+<!-- Menu -->
+<nav id="menu">
+<span class="landingName">
+<img id="menuLogo" src="assets/img/pac-man-icon.png" alt="logo"/><h2 id="menuName">PAC-MAN XR</h2>
+</span>
+<ul>
+<li><button class="menu" id="gameRestartButtonHTML">Restart Game</button></li>
+<li><button class="menu" id="enableAudioButtonHTML2">Enable Audio</button></li>
+<li><div id="howToPlayHTML">How to Play :</div></li>
+<li><div id="controlsInfoHTML">Move Pac-Man Up, Right, Left or Down around the maze to eat all dots on the screen while avoiding four colored ghosts to advance to the next level. Eat Power Pellets to turn the tide on your enemies.</div></li>
+<li><div id="controlsHTML">Ways to Play :</div></li>
+<li><div id="controlsInfoKeyboardHTML">Desktop Keyboard WASD/Arrows</div></li>
+<li><div id="controlsInfoMouseHTML">Mouse Hover X Controller</div></li>
+<li><div id="controlsInfoMobileTapHTML">Mobile Tap X Controller</div></li>
+<li><button class="menu" id="controlsInfoToggleAngleButtonHTML2">Hide X Controller</button></li>
+<li><div id="controlsInfoVRJHTML">VR Headset Joystick Controller</div></li>
+<li><button class="menu" id="enableVRHTML2">Enter VR</button></li>
+<li><div>See more by me: </div><a href="https://mintycrisp.com/">Minty Crisp</a></li>
+</ul>
+</nav>
+
+<!-- Begin Experience -->
+<div id="beginDiv">
+<li><button class="menu" id="startGameButtonHTML">Start Game</button></li>
+<li><button class="menu" id="enableAudioButtonHTML">Enable Audio</button></li>
+<li><button class="menu" id="controlsInfoToggleAngleButtonHTML">Hide X Controller</button></li>
+<li><button class="menu" id="enableVRHTML">Start Game in VR</button></li>
+</div> 
+
+<!-- Aframe and Controller -->
+<div id="aframeController" class="">
+<!-- - - - - - - - - - - A-Frame - - - - - - - - - - -->
+<div id="aframeBlock" class="">
+<a-scene id="ascene"
+game_control
+background="color: #310819"
+device-orientation-permission-ui="enabled: true"
+vr-mode-ui="enterVRButton: #enableVRHTML;"
+renderer="antialias: true; colorManagement: true; sortObjects: true"
+>
+<!-- - - - - - - - - - - Assets - - - - - - - - - - -->
+<a-assets timeout="4000">
+<!-- Namco Sounds -->
+<a-asset-item id="introSrc" src="./assets/audio/pacman_beginning.wav" preload="auto" crossorigin="anonymous" response-type="arraybuffer"></a-asset-item>
+<a-asset-item id="levelCompleteSrc" src="./assets/audio/pacman_intermission.wav" preload="auto" crossorigin="anonymous" response-type="arraybuffer"></a-asset-item>
+<a-asset-item id="deathSrc" src="./assets/audio/pacman_death.wav" preload="auto" crossorigin="anonymous" response-type="arraybuffer"></a-asset-item>
+<a-asset-item id="eatFruitSrc" src="./assets/audio/pacman_eatfruit.wav" preload="auto" crossorigin="anonymous" response-type="arraybuffer"></a-asset-item>
+<a-asset-item id="eatGhostSrc" src="./assets/audio/pacman_eatghost.wav" preload="auto" crossorigin="anonymous" response-type="arraybuffer"></a-asset-item>
+<a-asset-item id="extraLifeSrc" src="./assets/audio/pacman_extrapac.wav" preload="auto" crossorigin="anonymous" response-type="arraybuffer"></a-asset-item>
+<!-- https://freesound.org/people/LittleRobotSoundFactory/ -->
+<a-asset-item id="dotHitSrc" src="./assets/audio/270343__littlerobotsoundfactory__shoot-01.wav" preload="auto" crossorigin="anonymous" response-type="arraybuffer"></a-asset-item>
+<a-asset-item id="powerUpSrc" src="./assets/audio/270341__littlerobotsoundfactory__pickup-04.wav" preload="auto" crossorigin="anonymous" response-type="arraybuffer"></a-asset-item>
+
+<!-- - - - - - - - - - - Mixins - - - - - - - - - - -->
+<!-- Game Title -->
+<!-- P1 -->
+<a-mixin id="p1"
+position="-0.25 0 0"
+geometry="primitive: plane; height: 1.25; width: 0.5; segmentsHeight: 1; segmentsWidth: 1;"
+></a-mixin>
+<!-- P2 -->
+<a-mixin id="p2"
+position="0 0.125 0" rotation="0 0 -90" scale="1 1 1"
+geometry="primitive: circle; radius: 0.5; segments: 16; thetaStart: 0; thetaLength: 180"
+></a-mixin>
+<!-- P3 -->
+<a-mixin id="p3"
+position="0 0.125 0.05" rotation="0 0 -90" scale="1 1 1"
+geometry="primitive: plane; height: 0.25; width: 0.25; segmentsHeight: 1; segmentsWidth: 1;"
+></a-mixin>
+<!-- A1 -->
+<a-mixin id="a1"
+position="1.15 0 0" rotation="0 0 0" scale="1 1 1"
+geometry="primitive: triangle; vertexA: 0 0.6 0; vertexB: -0.6 -0.6 0; vertexC: 0.6 -0.6 0;"
+></a-mixin>
+<!-- A11 -->
+<a-mixin id="a11"
+position="1.15 -0.125 0.05" rotation="0 0 0" scale="1 1 1"
+geometry="primitive: plane; height: 0.25; width: 0.25; segmentsHeight: 1; segmentsWidth: 1;"
+></a-mixin>
+<!-- C -->
+<a-mixin id="c"
+position="2.4 0 0" rotation="0 0 45" scale="1 1 1"
+geometry="primitive: circle; radius: 0.69; segments: 16; thetaStart: 0; thetaLength: 270"
+></a-mixin>
+<!-- - -->
+<a-mixin id="dash"
+position="3.45 0 0" rotation="0 0 0" scale="1 1 1"
+geometry="primitive: plane; height: 0.25; width: 0.5; segmentsHeight: 1; segmentsWidth: 1;"
+></a-mixin>
+<!-- M1 -->
+<a-mixin id="m1"
+position="4.1 0 0" rotation="0 0 0" scale="1 1 1"
+geometry="primitive: triangle; vertexA: 0 0.6 0; vertexB: 0 -0.6 0; vertexC: 1 -0.6 0;"
+></a-mixin>
+<!-- M2 -->
+<a-mixin id="m2"
+position="5.1 0 0" rotation="0 0 0" scale="1 1 1"
+geometry="primitive: triangle; vertexA: 0 0.6 0; vertexB: 0 -0.6 0; vertexC: -1 -0.6 0;"
+></a-mixin>
+<!-- A2 -->
+<a-mixin id="a2"
+position="6.05 0 0" rotation="0 0 0" scale="1 1 1"
+geometry="primitive: triangle; vertexA: 0 0.6 0; vertexB: -0.6 -0.6 0; vertexC: 0.6 -0.6 0;"
+></a-mixin>
+<!-- A22 -->
+<a-mixin id="a21"
+position="6.05 -0.125 0.05" rotation="0 0 0" scale="1 1 1"
+geometry="primitive: plane; height: 0.25; width: 0.25; segmentsHeight: 1; segmentsWidth: 1;"
+></a-mixin>
+<!-- N1 -->
+<a-mixin id="n1"
+position="6.8 0 0" rotation="0 0 0" scale="1 1 1"
+geometry="primitive: triangle; vertexA: 0 0.6 0; vertexB: 0 -0.6 0; vertexC: 0.8 -0.6 0;"
+></a-mixin>
+<!-- N2 -->
+<a-mixin id="n2"
+position="7.4 0.025 0" rotation="0 0 0" scale="1 1 1"
+geometry="primitive: plane; height: 1.25; width: 0.5; segmentsHeight: 1; segmentsWidth: 1;"
+></a-mixin>
+<!-- XR Bkgd -->
+<a-mixin id="xrBkgd"
+position="3.45 -1 0" rotation="0 0 0" scale="1 1 1"
+geometry="primitive: plane; height: 0.65; width: 0.65; segmentsHeight: 1; segmentsWidth: 1;"
+></a-mixin>
+
+<!-- Ghosts -->
+<!-- Eye Pupil -->
+<a-mixin id="ghostEye"
+scale="1.25 1 1"
+position="0 0.01 0"
+
+geometry="primitive: cylinder; height: 0.025; openEnded: false; radius: 0.1; segmentsHeight: 2; segmentsRadial: 16; thetaStart: 0; thetaLength: 360"
+
+animation__lookDown="property: position; to: 0 0.01 0.07; dur: 100; delay: 0; loop: false; dir: normal; easing: easeInOutSine; elasticity: 400; autoplay: false; enabled: true; startEvents: lookDown"
+
+animation__lookUp="property: position; to: 0 0.01 -0.07; dur: 100; delay: 0; loop: false; dir: normal; easing: easeInOutSine; elasticity: 400; autoplay: false; enabled: true; startEvents: lookUp"
+
+animation__lookRight="property: position; to: 0.05 0.01 0; dur: 100; delay: 0; loop: false; dir: normal; easing: easeInOutSine; elasticity: 400; autoplay: false; enabled: true; startEvents: lookRight"
+
+animation__lookLeft="property: position; to: -0.05 0.01 0; dur: 100; delay: 0; loop: false; dir: normal; easing: easeInOutSine; elasticity: 400; autoplay: false; enabled: true; startEvents: lookLeft"
+></a-mixin>
+<!-- Eye Socket -->
+<a-mixin id="ghostEyeSocket"
+position="0 0 0" rotation="90 0 0" scale="0.75 1 1"
+
+geometry="primitive: cylinder; height: 0.0125; openEnded: false; radius: 0.175; segmentsHeight: 2; segmentsRadial: 16; thetaStart: 0; thetaLength: 360"
+></a-mixin>
+<!-- Eye Socket 1 -->
+<a-mixin id="ghostEyeSocket1"
+position="-0.15 0.1 0.4"
+></a-mixin>
+<!-- Eye Socket 2 -->
+<a-mixin id="ghostEyeSocket2"
+position="0.15 0.1 0.4"
+></a-mixin>
+
+<!-- Spin | All Body Parts except Eyes -->
+<a-mixin id="ghostSpin"
+position="0 -0.1 0"
+animation__testRotate="property: object3D.rotation.y; from: 0; to: 360; dur: 1500; delay: 0; loop: true; dir: normal; easing: linear; elasticity: 400; autoplay: true; enabled: true;"
+></a-mixin>
+
+<!-- Head -->
+<a-mixin id="ghostHead"
+rotation="-90 0 0" position="0 0.15 0"
+geometry="primitive: sphere; radius: 0.4; phiStart: 0; phiLength: 180; segmentsWidth: 16; segmentsHeight: 16; thetaStart: 0; thetaLength: 180"
+></a-mixin>
+
+<!-- Body -->
+<a-mixin id="ghostBody"
+geometry="primitive: cylinder; height: 0.3; openEnded: false; radius: 0.4; segmentsHeight: 2; segmentsRadial: 32; thetaStart: 0; thetaLength: 360"
+></a-mixin>
+
+<!-- Legs -->
+<a-mixin id="ghostLeg1"
+position="-0.25 -0.25 0"
+geometry="primitive: cone; openEnded: false; height: 0.2; radiusBottom: 0; radiusTop: 0.15; segmentsHeight: 4; segmentsRadial: 8; thetaStart: 0; thetaLength: 360"
+></a-mixin>
+<a-mixin id="ghostLeg2"
+position="0.25 -0.25 0"
+geometry="primitive: cone; openEnded: false; height: 0.2; radiusBottom: 0; radiusTop: 0.15; segmentsHeight: 4; segmentsRadial: 8; thetaStart: 0; thetaLength: 360"
+></a-mixin>
+<a-mixin id="ghostLeg3"
+position="0 -0.25 -0.25"
+geometry="primitive: cone; openEnded: false; height: 0.2; radiusBottom: 0; radiusTop: 0.15; segmentsHeight: 4; segmentsRadial: 8; thetaStart: 0; thetaLength: 360"
+></a-mixin>
+<a-mixin id="ghostLeg4"
+position="0 -0.25 0.25"
+geometry="primitive: cone; openEnded: false; height: 0.2; radiusBottom: 0; radiusTop: 0.15; segmentsHeight: 4; segmentsRadial: 8; thetaStart: 0; thetaLength: 360"
+></a-mixin>
+
+<!-- Quezy Mouth -->
+<a-mixin id="quezyMouth" visible="false"
+line="start: -0.3 -0.2 0.41; end: -0.2 -0.15 0.41; color: white;"
+line__2="start: -0.2 -0.15 0.41; end: -0.1 -0.2 0.41; color: white"
+line__3="start: -0.1 -0.2 0.41; end: 0 -0.15 0.41; color: white"
+line__4="start: 0 -0.15 0.41; end: 0.1 -0.2 0.41; color: white"
+line__5="start: 0.1 -0.2 0.41; end: 0.2 -0.15 0.41; color: white"
+line__6="start: 0.2 -0.15 0.41; end: 0.3 -0.2 0.41; color: white"
+
+animation__powerUpChange="property: visible; to: true; dur: 100; delay: 0; loop: false; dir: normal; easing: linear; elasticity: 400; autoplay: false; enabled: true; startEvents: poweredUp"
+
+animation__powerDownChange="property: visible; to: false; dur: 100; delay: 0; loop: false; dir: normal; easing: linear; elasticity: 400; autoplay: false; enabled: true; startEvents: poweredDown"
+></a-mixin>
+
+<!-- Colors -->
+<a-mixin id="ghostRed"
+material="color: #fc0412; opacity: 1; side: double; metalness: 0.2; roughness: 0.8; emissive: #fc0412; emissiveIntensity: 0.25;"
+
+animation__powerUpChange="property: material.color; to: #1500fa; dur: 100; delay: 0; loop: false; dir: normal; easing: linear; elasticity: 400; autoplay: false; enabled: true; startEvents: poweredUp"
+animation__powerUpChang2="property: material.emissive; to: #1500fa; dur: 100; delay: 0; loop: false; dir: normal; easing: linear; elasticity: 400; autoplay: false; enabled: true; startEvents: poweredUp"
+
+animation__powerDownChange="property: material.color; to: #fc0412; dur: 100; delay: 0; loop: false; dir: normal; easing: linear; elasticity: 400; autoplay: false; enabled: true; startEvents: poweredDown"
+animation__powerDownChange2="property: material.emissive; to: #fc0412; dur: 100; delay: 0; loop: false; dir: normal; easing: linear; elasticity: 400; autoplay: false; enabled: true; startEvents: poweredDown"
+></a-mixin>
+<a-mixin id="ghostPink"
+material="color: #f8b0fc; opacity: 1; side: double; metalness: 0.2; roughness: 0.8; emissive: #f8b0fc; emissiveIntensity: 0.25;"
+
+animation__powerUpChange="property: material.color; to: #1500fa; dur: 100; delay: 0; loop: false; dir: normal; easing: linear; elasticity: 400; autoplay: false; enabled: true; startEvents: poweredUp"
+animation__powerUpChang2="property: material.emissive; to: #1500fa; dur: 100; delay: 0; loop: false; dir: normal; easing: linear; elasticity: 400; autoplay: false; enabled: true; startEvents: poweredUp"
+
+animation__powerDownChange="property: material.color; to: #f8b0fc; dur: 100; delay: 0; loop: false; dir: normal; easing: linear; elasticity: 400; autoplay: false; enabled: true; startEvents: poweredDown"
+animation__powerDownChange2="property: material.emissive; to: #f8b0fc; dur: 100; delay: 0; loop: false; dir: normal; easing: linear; elasticity: 400; autoplay: false; enabled: true; startEvents: poweredDown"
+></a-mixin>
+<a-mixin id="ghostTeal"
+material="color: #00fbff; opacity: 1; side: double; metalness: 0.2; roughness: 0.8; emissive: #00fbff; emissiveIntensity: 0.25;"
+
+animation__powerUpChange="property: material.color; to: #1500fa; dur: 100; delay: 0; loop: false; dir: normal; easing: linear; elasticity: 400; autoplay: false; enabled: true; startEvents: poweredUp"
+animation__powerUpChang2="property: material.emissive; to: #1500fa; dur: 100; delay: 0; loop: false; dir: normal; easing: linear; elasticity: 400; autoplay: true; enabled: true; startEvents: poweredUp"
+
+animation__powerDownChange="property: material.color; to: #00fbff; dur: 100; delay: 0; loop: false; dir: normal; easing: linear; elasticity: 400; autoplay: false; enabled: true; startEvents: poweredDown"
+animation__powerDownChange2="property: material.emissive; to: #00fbff; dur: 100; delay: 0; loop: false; dir: normal; easing: linear; elasticity: 400; autoplay: false; enabled: true; startEvents: poweredDown"
+></a-mixin>
+<a-mixin id="ghostOrange"
+material="color: #eeb63d; opacity: 1; side: double; metalness: 0.2; roughness: 0.8; emissive: #eeb63d; emissiveIntensity: 0.25;"
+
+animation__powerUpChange="property: material.color; to: #1500fa; dur: 100; delay: 0; loop: false; dir: normal; easing: linear; elasticity: 400; autoplay: false; enabled: true; startEvents: poweredUp"
+animation__powerUpChang2="property: material.emissive; to: #1500fa; dur: 100; delay: 0; loop: false; dir: normal; easing: linear; elasticity: 400; autoplay: false; enabled: true; startEvents: poweredUp"
+
+animation__powerDownChange="property: material.color; to: #eeb63d; dur: 100; delay: 0; loop: false; dir: normal; easing: linear; elasticity: 400; autoplay: false; enabled: true; startEvents: poweredDown"
+animation__powerDownChange2="property: material.emissive; to: #eeb63d; dur: 100; delay: 0; loop: false; dir: normal; easing: linear; elasticity: 400; autoplay: false; enabled: true; startEvents: poweredDown"
+></a-mixin>
+<a-mixin id="ghostBlue"
+material="color: #1500fa; opacity: 1; side: double; metalness: 0.2; roughness: 0.8; emissive: #1500fa; emissiveIntensity: 0.25;"
+></a-mixin>
+<a-mixin id="ghostChangeBlueToWhite"
+
+animation__powerUpChange="property: material.color; to: #fcfafd; dur: 100; delay: 0; loop: false; dir: normal; easing: linear; elasticity: 400; autoplay: false; enabled: true; startEvents: poweredUp"
+animation__powerUpChange2="property: material.emissive; to: #fcfafd; dur: 100; delay: 0; loop: false; dir: normal; easing: linear; elasticity: 400; autoplay: false; enabled: true; startEvents: poweredUp"
+
+animation__powerDownChange="property: material.color; to: #1500fa; dur: 100; delay: 0; loop: false; dir: normal; easing: linear; elasticity: 400; autoplay: false; enabled: true; startEvents: poweredDown"
+animation__powerDownChange2="property: material.emissive; to: #1500fa; dur: 100; delay: 0; loop: false; dir: normal; easing: linear; elasticity: 400; autoplay: false; enabled: true; startEvents: poweredDown"
+></a-mixin>
+<a-mixin id="ghostWhite"
+material="color: #fcfafd; opacity: 1; side: double; metalness: 0.2; roughness: 0.8; emissive: #fcfafd; emissiveIntensity: 0.25;"
+></a-mixin>
+<a-mixin id="ghostChangeWhiteToBlue"
+
+animation__powerUpChange="property: material.color; to: #1500fa; dur: 100; delay: 0; loop: false; dir: normal; easing: linear; elasticity: 400; autoplay: false; enabled: true; startEvents: poweredUp"
+animation__powerUpChange2="property: material.emissive; to: #1500fa; dur: 100; delay: 0; loop: false; dir: normal; easing: linear; elasticity: 400; autoplay: false; enabled: true; startEvents: poweredUp"
+
+animation__powerDownChange="property: material.color; to: #fcfafd; dur: 100; delay: 0; loop: false; dir: normal; easing: linear; elasticity: 400; autoplay: false; enabled: true; startEvents: poweredDown"
+animation__powerDownChange2="property: material.emissive; to: #fcfafd; dur: 100; delay: 0; loop: false; dir: normal; easing: linear; elasticity: 400; autoplay: false; enabled: true; startEvents: poweredDown"
+></a-mixin>
+<a-mixin id="playerYellow"
+material="color: #f2f603; opacity: 1; side: double; metalness: 0.2; roughness: 0.8; emissive: #eeb63d; emissiveIntensity: 0.25;"
+></a-mixin>
+<a-mixin id="blackAccent"
+material="color: #50503a; opacity: 1; side: double; metalness: 0.2; roughness: 0.8; emissive: #50503a; emissiveIntensity: 0.25;"
+></a-mixin>
+<a-mixin id="ghostBlueTimer"
+
+animation__powerUpTimerBlink="property: material.color; from: #1500fa; to: #ffbeb2; dur: 300; delay: 0; loop: 10; dir: alternate; easing: linear; elasticity: 400; autoplay: false; enabled: true; startEvents: poweredUpWarning; pauseEvents: poweredUp, poweredDown"
+animation__powerUpTimerBlink2="property: material.emissive; from: #1500fa; to: #ffbeb2; dur: 300; delay: 0; loop: 10; dir: alternate; easing: linear; elasticity: 400; autoplay: false; enabled: true; startEvents: poweredUpWarning; pauseEvents: poweredUp, poweredDown"
+></a-mixin>
+
+<a-mixin id="bonusPointsText"
+
+animation__bonusHit="property: text.opacity; from: 0; to: 1; dur: 500; delay: 0; loop: false; dir: normal; easing: easeInOutSine; elasticity: 400; autoplay: false; enabled: true; startEvents: bonusHit"
+animation__bonusHit2="property: text.opacity; from: 1; to: 0; dur: 2000; delay: 500; loop: false; dir: normal; easing: easeInOutSine; elasticity: 400; autoplay: false; enabled: true; startEvents: bonusHit"
+></a-mixin>
+
+<a-mixin id="playerSplash"
+line="start: 0.175 0 0; end: 0.35 0 0; color: #f2f603; opacity: 0"
+
+animation__showSplash="property: line.opacity; from: 0; to: 1; dur: 550; delay: 1970; loop: 1; dir: alternate; easing: easeInElastic; elasticity: 400; autoplay: false; enabled: true; startEvents: death"
+></a-mixin>
+
+<a-mixin id="playerLives"
+rotation="0 90 0" position="0 0 0" scale="1 1 1"
+
+geometry="primitive: cylinder; height: 0.1; openEnded: false; radius: 0.35; segmentsHeight: 2; segmentsRadial: 32; thetaStart: 225; thetaLength: 270;"
+></a-mixin>
+
+</a-assets>
+<!-- - - - - - - - - - - Scene - - - - - - - - - - -->
+
+<!-- Current Level -->
+<a-entity id="currentLevelItem"
+position="5.05 0 -7.25" rotation="0 0 0" scale="1.75 1.75 1.75">
+
+<!-- Cherry -->
+<a-entity id="cherry1-level" visible="false"
+position="0 0 0" rotation="0 0 0" scale="1 1 1"
+
+geometry="primitive: sphere; radius: 0.1; phiStart: 0; phiLength: 360; segmentsWidth: 8; segmentsHeight: 32; thetaStart: 0; thetaLength: 360"
+
+material="color: #C14B76; opacity: 1; side: double; metalness: 0.2; roughness: 0.8; emissive: #C14B76; emissiveIntensity: 0.75;"
+></a-entity>
+<a-entity id="cherry2-level" visible="false"
+position="0.15 0.05 0.1" rotation="0 0 0" scale="1 1 1"
+
+geometry="primitive: sphere; radius: 0.1; phiStart: 0; phiLength: 360; segmentsWidth: 8; segmentsHeight: 32; thetaStart: 0; thetaLength: 360"
+
+material="color: #C14B76; opacity: 1; side: double; metalness: 0.2; roughness: 0.8; emissive: #C14B76; emissiveIntensity: 0.75;"
+></a-entity>
+
+<!-- Strawberry -->
+<a-entity id="strawberry-level" visible="false"
+position="0 0 0" rotation="90 0 0" scale="1 1 1"
+
+geometry="primitive: cone; openEnded: false; height: 0.25; radiusBottom: 0.15; radiusTop: 0.05; segmentsHeight: 18; segmentsRadial: 32; thetaStart: 0; thetaLength: 360"
+
+material="color: #b12881; opacity: 1; side: double; metalness: 0.2; roughness: 0.8; emissive: #b12881; emissiveIntensity: 0.75;"
+></a-entity>
+
+<!-- Orange -->
+<a-entity id="orange-level" visible="false"
+position="0 0 0" rotation="0 0 0" scale="1 1 0.75"
+
+geometry="primitive: sphere; radius: 0.2; phiStart: 0; phiLength: 360; segmentsWidth: 8; segmentsHeight: 32; thetaStart: 0; thetaLength: 360"
+
+material="color: #ef952d; opacity: 1; side: double; metalness: 0.2; roughness: 0.8; emissive: #ef952d; emissiveIntensity: 0.75;"
+></a-entity>
+
+<!-- Apple -->
+<a-entity id="apple-level" visible="false"
+position="0 0 0" rotation="0 0 0" scale="1 1 1"
+
+geometry="primitive: sphere; radius: 0.2; phiStart: 0; phiLength: 360; segmentsWidth: 8; segmentsHeight: 32; thetaStart: 0; thetaLength: 360"
+
+material="color: #ff0e14; opacity: 1; side: double; metalness: 0.2; roughness: 0.8; emissive: #ff0e14; emissiveIntensity: 0.75;"
+></a-entity>
+
+<!-- Melon -->
+<a-entity id="melon-level" visible="false"
+position="0 0 0" rotation="0 0 0" scale="0.75 1 1"
+
+geometry="primitive: sphere; radius: 0.2; phiStart: 0; phiLength: 360; segmentsWidth: 8; segmentsHeight: 32; thetaStart: 0; thetaLength: 360"
+
+material="color: #3EB489; opacity: 1; side: double; metalness: 0.2; roughness: 0.8; emissive: #3EB489; emissiveIntensity: 0.75;"
+></a-entity>
+
+<!-- Diamond -->
+<a-entity id="diamond-level" visible="false"
+position="0 0 0" rotation="45 45 45" scale="1 1 1"
+
+geometry="primitive: box; height: 0.25; width: 0.25; depth: 0.25; segmentsHeight: 1; segmentsWidth: 1; segmentsDepth: 1;"
+
+material="color: #ffbeb2; opacity: 1; side: double; metalness: 0.2; roughness: 0.8; emissive: #ffbeb2; emissiveIntensity: 0.75;"
+></a-entity>
+
+<!-- Bell -->
+<a-entity id="bell-level" visible="false"
+position="0 0 0" rotation="90 0 0" scale="1 1 1"
+
+geometry="primitive: cone; openEnded: false; height: 0.3; radiusBottom: 0.1; radiusTop: 0.3; segmentsHeight: 18; segmentsRadial: 32; thetaStart: 0; thetaLength: 360"
+
+material="color: #ba7a22; opacity: 1; side: double; metalness: 0.2; roughness: 0.8; emissive: #ba7a22; emissiveIntensity: 0.75;"
+></a-entity>
+
+<!-- Key -->
+<a-entity id="key-level" visible="false"
+position="0 0 0" rotation="90 0 0" scale="1 1 1"
+
+geometry="primitive: torus; radius: 0.15; radiusTubular: 0.015; arc: 360"
+
+material="color: #eeb63d; opacity: 1; side: double; metalness: 0.2; roughness: 0.8; emissive: #eeb63d; emissiveIntensity: 0.75;"
+></a-entity>
+
+</a-entity>
+
+<!-- Bonus Item -->
+<a-entity id="bonusItem"
+position="0.5 0 1" rotation="0 0 0" scale="1.25 1.25 1.25">
+
+<!-- Cherry -->
+<a-entity id="cherry1-bonus" visible="false"
+position="0 0 0" rotation="0 0 0" scale="1 1 1"
+
+geometry="primitive: sphere; radius: 0.1; phiStart: 0; phiLength: 360; segmentsWidth: 8; segmentsHeight: 32; thetaStart: 0; thetaLength: 360"
+
+material="color: #C14B76; opacity: 1; side: double; metalness: 0.2; roughness: 0.8; emissive: #C14B76; emissiveIntensity: 0.75;"
+></a-entity>
+<a-entity id="cherry2-bonus" visible="false"
+position="0.15 0.05 0.1" rotation="0 0 0" scale="1 1 1"
+
+geometry="primitive: sphere; radius: 0.1; phiStart: 0; phiLength: 360; segmentsWidth: 8; segmentsHeight: 32; thetaStart: 0; thetaLength: 360"
+
+material="color: #C14B76; opacity: 1; side: double; metalness: 0.2; roughness: 0.8; emissive: #C14B76; emissiveIntensity: 0.75;"
+></a-entity>
+
+<!-- Strawberry -->
+<a-entity id="strawberry-bonus" visible="false"
+position="0 0 0" rotation="90 0 0" scale="1 1 1"
+
+geometry="primitive: cone; openEnded: false; height: 0.25; radiusBottom: 0.15; radiusTop: 0.05; segmentsHeight: 18; segmentsRadial: 32; thetaStart: 0; thetaLength: 360"
+
+material="color: #b12881; opacity: 1; side: double; metalness: 0.2; roughness: 0.8; emissive: #b12881; emissiveIntensity: 0.75;"
+></a-entity>
+
+<!-- Orange -->
+<a-entity id="orange-bonus" visible="false"
+position="0 0 0" rotation="0 0 0" scale="1 1 0.75"
+
+geometry="primitive: sphere; radius: 0.2; phiStart: 0; phiLength: 360; segmentsWidth: 8; segmentsHeight: 32; thetaStart: 0; thetaLength: 360"
+
+material="color: #ee733d; opacity: 1; side: double; metalness: 0.2; roughness: 0.8; emissive: #ee733d; emissiveIntensity: 0.75;"
+></a-entity>
+
+<!-- Apple -->
+<a-entity id="apple-bonus" visible="false"
+position="0 0 0" rotation="0 0 0" scale="1 1 1"
+
+geometry="primitive: sphere; radius: 0.2; phiStart: 0; phiLength: 360; segmentsWidth: 8; segmentsHeight: 32; thetaStart: 0; thetaLength: 360"
+
+material="color: #ff0e14; opacity: 1; side: double; metalness: 0.2; roughness: 0.8; emissive: #ff0e14; emissiveIntensity: 0.75;"
+></a-entity>
+
+<!-- Melon -->
+<a-entity id="melon-bonus" visible="false"
+position="0 0 0" rotation="0 0 0" scale="0.75 1 1"
+
+geometry="primitive: sphere; radius: 0.2; phiStart: 0; phiLength: 360; segmentsWidth: 8; segmentsHeight: 32; thetaStart: 0; thetaLength: 360"
+
+material="color: #3EB489; opacity: 1; side: double; metalness: 0.2; roughness: 0.8; emissive: #3EB489; emissiveIntensity: 0.75;"
+></a-entity>
+
+<!-- Diamond -->
+<a-entity id="diamond-bonus" visible="false"
+position="0 0 0" rotation="45 45 45" scale="1 1 1"
+
+geometry="primitive: box; height: 0.25; width: 0.25; depth: 0.25; segmentsHeight: 1; segmentsWidth: 1; segmentsDepth: 1;"
+
+material="color: #ffbeb2; opacity: 1; side: double; metalness: 0.2; roughness: 0.8; emissive: #ffbeb2; emissiveIntensity: 0.75;"
+></a-entity>
+
+<!-- Bell -->
+<a-entity id="bell-bonus" visible="false"
+position="0 0 0" rotation="90 0 0" scale="1 1 1"
+
+geometry="primitive: cone; openEnded: false; height: 0.3; radiusBottom: 0.1; radiusTop: 0.3; segmentsHeight: 18; segmentsRadial: 32; thetaStart: 0; thetaLength: 360"
+
+material="color: #ba7a22; opacity: 1; side: double; metalness: 0.2; roughness: 0.8; emissive: #ba7a22; emissiveIntensity: 0.75;"
+></a-entity>
+
+<!-- Key -->
+<a-entity id="key-bonus" visible="false"
+position="0 0 0" rotation="90 0 0" scale="1 1 1"
+
+geometry="primitive: torus; radius: 0.15; radiusTubular: 0.015; arc: 360"
+
+material="color: #eeb63d; opacity: 1; side: double; metalness: 0.2; roughness: 0.8; emissive: #eeb63d; emissiveIntensity: 0.75;"
+></a-entity>
+
+</a-entity>
+
+<!-- Bonus Points Text -->
+<a-entity id="bonusPoints1" mixin="bonusPointsText"
+position="-0.55 1 0.7" rotation="-90 0 0" scale="1 1 1" 
+text="value:100; width: 10; color: #FFFFFF; align: center; font: exo2bold; opacity: 0;"
+></a-entity>
+<a-entity id="bonusPoints2" mixin="bonusPointsText"
+position="-0.55 1 0.7" rotation="-90 0 0" scale="1 1 1" 
+text="value:200; width: 10; color: #FFFFFF; align: center; font: exo2bold; opacity: 0;"
+></a-entity>
+<a-entity id="bonusPoints3" mixin="bonusPointsText"
+position="-0.55 1 0.7" rotation="-90 0 0" scale="1 1 1" 
+text="value:400; width: 10; color: #FFFFFF; align: center; font: exo2bold; opacity: 0;"
+></a-entity>
+<a-entity id="bonusPoints4" mixin="bonusPointsText"
+position="-0.55 1 0.7" rotation="-90 0 0" scale="1 1 1" 
+text="value:800; width: 10; color: #FFFFFF; align: center; font: exo2bold; opacity: 0;"
+></a-entity>
+<a-entity id="bonusPoints5" mixin="bonusPointsText"
+position="-0.55 1 0.7" rotation="-90 0 0" scale="1 1 1" 
+text="value:1600; width: 10; color: #FFFFFF; align: center; font: exo2bold; opacity: 0;"
+></a-entity>
+
+<!-- Current Lives -->
+<a-entity id="playerLives"
+position="-4.5 0 -8.75" rotation="0 0 0"
+>
+<a-entity id="playerLife1" mixin="playerLives playerYellow"
+position="0 0 1.6"></a-entity>
+<a-entity id="playerLife2" mixin="playerLives playerYellow"
+position="0 0 0.8"></a-entity>
+<a-entity id="playerLife3" mixin="playerLives playerYellow" visible="false"
+position="0 0 0"></a-entity>
+</a-entity>
+
+<!-- Game Status Text -->
+
+<!-- Game Start Countdown Text -->
+<a-entity id="gameStartCountdown"
+position="0.55 1 -0.7" rotation="-90 0 0" scale="1 1 1" 
+text="value:5; width: 20; color: #FFFFFF; align: center; font: exo2bold;"
+></a-entity>
+
+<!-- Player Score -->
+<a-entity id="scoreText"
+position="1 0.15 -7.45" rotation="-90 0 0" scale="1 1 1" 
+text="value:Score : ; width: 10; color: #ffffff; align: left; font: exo2bold;"
+></a-entity>
+
+<!-- Hi Score -->
+<a-entity id="hiScoreText"
+position="1 0.15 -7" rotation="-90 0 0" scale="1 1 1" 
+text="value:Hi-Score : 10,000; width: 10; color: #ffffff; align: left; font: exo2bold;"
+></a-entity>
+
+<!-- Player -->
+<a-entity id="playerText"
+position="0.5 0.1 -2.15" rotation="-90 0 0" scale="1 1 1" 
+text="value:PLAYER; width: 20; color: #1801fd; align: center; font: exo2bold;"
+></a-entity>
+
+<!-- Ready -->
+<a-entity id="readyText"
+position="0.5 0.1 0.85" rotation="-90 0 0" scale="1 1 1" 
+text="value:READY!; width: 20; color: #f2f603; align: center; font: exo2bold;"
+></a-entity>
+
+<!-- Game Over -->
+<a-entity id="gameOverText"
+position="0.5 0.1 0.85" rotation="-90 0 0" scale="1 1 1" 
+text="value:GAME OVER; width: 15; color: #fc0412; align: center; font: exo2bold;"
+></a-entity>
+
+<!-- Game Title -->
+<!-- Top Yellow -->
+<a-entity id="gameTitleTop"
+position="-3.1 0.1 -8.35" rotation="-90 0 0" scale="1 1 1"
+>
+<!-- P1 -->
+<a-entity id="p1Top" class="title" mixin="playerYellow p1"></a-entity>
+<!-- P2 -->
+<a-entity id="p2Top" class="title" mixin="playerYellow p2"></a-entity>
+<!-- P3 -->
+<a-entity id="p3Top" class="title" mixin="blackAccent p3"></a-entity>
+<!-- A1 -->
+<a-entity id="a1Top" class="title" mixin="playerYellow a1"></a-entity>
+<!-- A11 -->
+<a-entity id="a11Top" class="title" mixin="blackAccent a11"></a-entity>
+<!-- C -->
+<a-entity id="cTop" class="title" mixin="playerYellow c"></a-entity>
+<!-- - -->
+<a-entity id="dashTop" class="title" mixin="playerYellow dash"></a-entity>
+<!-- M1 -->
+<a-entity id="m1Top" class="title" mixin="playerYellow m1"></a-entity>
+<!-- M2 -->
+<a-entity id="m2Top" class="title" mixin="playerYellow m2"></a-entity>
+<!-- A2 -->
+<a-entity id="a2Top" class="title" mixin="playerYellow a2"></a-entity>
+<!-- A21 -->
+<a-entity id="a21Top" class="title" mixin="blackAccent a21"></a-entity>
+<!-- N1 -->
+<a-entity id="n1Top" class="title" mixin="playerYellow n1"></a-entity>
+<!-- N2 -->
+<a-entity id="n2Top" class="title" mixin="playerYellow n2"></a-entity>
+<!-- xrBkgd -->
+<a-entity id="xrBkgdTop" class="title" mixin="playerYellow xrBkgd"></a-entity>
+</a-entity><!-- End gameTitle Top yellow -->
+
+<!-- Middle Blue -->
+<a-entity id="gameTitleMid"
+position="-3 0.075 -8.25" rotation="-90 0 0" scale="1 1 1"
+>
+<!-- P1 -->
+<a-entity id="p1Top" class="title" mixin="ghostBlue p1"></a-entity>
+<!-- P2 -->
+<a-entity id="p2Top" class="title" mixin="ghostBlue p2"></a-entity>
+<!-- A1 -->
+<a-entity id="a1Top" class="title" mixin="ghostBlue a1"></a-entity>
+<!-- C -->
+<a-entity id="cTop" class="title" mixin="ghostBlue c"></a-entity>
+<!-- - -->
+<a-entity id="dashTop" class="title" mixin="ghostBlue dash"></a-entity>
+<!-- M1 -->
+<a-entity id="m1Top" class="title" mixin="ghostBlue m1"></a-entity>
+<!-- M2 -->
+<a-entity id="m2Top" class="title" mixin="ghostBlue m2"></a-entity>
+<!-- A2 -->
+<a-entity id="a2Top" class="title" mixin="ghostBlue a2"></a-entity>
+<!-- N1 -->
+<a-entity id="n1Top" class="title" mixin="ghostBlue n1"></a-entity>
+<!-- N2 -->
+<a-entity id="n2Top" class="title" mixin="ghostBlue n2"></a-entity>
+<!-- xrBkgd -->
+<a-entity id="xrBkgdTop" class="title" mixin="ghostBlue xrBkgd"></a-entity>
+</a-entity><!-- End gameTitle Middle Blue -->
+
+<!-- Bottom White -->
+<a-entity id="gameTitleBottom"
+position="-3.2 0.05 -8.45" rotation="-90 0 0" scale="1 1 1"
+>
+<!-- P1 -->
+<a-entity id="p1Top" class="title" mixin="ghostWhite p1"></a-entity>
+<!-- P2 -->
+<a-entity id="p2Top" class="title" mixin="ghostWhite p2"></a-entity>
+<!-- A1 -->
+<a-entity id="a1Top" class="title" mixin="ghostWhite a1"></a-entity>
+<!-- C -->
+<a-entity id="cTop" class="title" mixin="ghostWhite c"></a-entity>
+<!-- - -->
+<a-entity id="dashTop" class="title" mixin="ghostWhite dash"></a-entity>
+<!-- M1 -->
+<a-entity id="m1Top" class="title" mixin="ghostWhite m1"></a-entity>
+<!-- M2 -->
+<a-entity id="m2Top" class="title" mixin="ghostWhite m2"></a-entity>
+<!-- A2 -->
+<a-entity id="a2Top" class="title" mixin="ghostWhite a2"></a-entity>
+<!-- N1 -->
+<a-entity id="n1Top" class="title" mixin="ghostWhite n1"></a-entity>
+<!-- N2 -->
+<a-entity id="n2Top" class="title" mixin="ghostWhite n2"></a-entity>
+<!-- xrBkgd -->
+<a-entity id="xrBkgdTop" class="title" mixin="ghostWhite xrBkgd"></a-entity>
+</a-entity>
+
+<!-- XR -->
+<a-entity id="xrTextTop"
+position="0.36 0.125 -7.5" rotation="-90 0 0" scale="1 1 1" 
+text="value:XR; width: 10; color: #000000; align: center; font: exo2bold;"
+></a-entity>
+
+<!-- By Minty Crisp -->
+<a-entity id="creditText" rotation="-90 0 0" scale="1 1 1" 
+position="3.5 0.1 -7.3"
+>
+<a-entity id="creditText"
+position="-1.65 0 0" rotation="0 0 0" scale="1 1 1" 
+text="value:by ; width: 10; color: #ffffff; align: center; font: exo2bold;"
+></a-entity>
+<a-entity id="creditText"
+position="-0.65 0 0" rotation="0 0 0" scale="1 1 1" 
+text="value:Minty ; width: 10; color: #3EB489; align: center; font: exo2bold;"
+></a-entity>
+<a-entity id="creditText"
+position="0.55 0 0" rotation="0 0 0" scale="1 1 1" 
+text="value:Crisp; width: 10; color: #C14B76; align: center; font: exo2bold;"
+></a-entity>
+</a-entity>
+
+<!-- - - - - - - - - - - Player - - - - - - - - - - -->
+<a-entity id="playerOnBoard"
+position="0.5 0 3" rotation="0 0 0" scale="0.9 0.9 0.9"
+>
+	<a-cylinder id="playerAvatar" mixin="playerYellow"
+	rotation="0 90 0" position="0 0 0" scale="1 1 1"
+
+	height="0.225"
+	radius="0.45"
+	segments-height="2"
+	segments-radial="32"
+	open-ended="false"
+	side="double"
+	theta-start="225"
+	theta-length="270"
+
+	animation__eatingThetaStart="property: theta-start; from: 225; to: 180; dur: 200; delay: 0; loop: true; dir: alternate; easing: linear; elasticity: 400; autoplay: false; enabled: true; pauseEvents: hitWall,death; resumeEvents: moving;"
+
+	animation__eatingThetaLength="property: theta-length; from: 270; to: 360; dur: 200; delay: 0; loop: true; dir: alternate; easing: linear; elasticity: 400; autoplay: false; enabled: true; pauseEvents: hitWall,death; resumeEvents: moving;"
+
+	animation__deathThetaStart="property: theta-start; from: -180; to: 0; dur: 2000; delay: 500; loop: false; dir: normal; easing: linear; elasticity: 400; autoplay: false; enabled: true; startEvents: death;"
+
+	animation__deathThetaLength="property: theta-length; from: 360; to: 0; dur: 2000; delay: 500; loop: false; dir: normal; easing: linear; elasticity: 400; autoplay: false; enabled: true; startEvents: death;"
+
+	>
+	<a-entity id="playerDeathSplash" mixin="playerSplash"></a-entity>
+	<a-entity id="playerDeathSplash2" mixin="playerSplash" rotation="0 45 0"></a-entity>
+	<a-entity id="playerDeathSplash3" mixin="playerSplash" rotation="0 90 0"></a-entity>
+	<a-entity id="playerDeathSplash4" mixin="playerSplash" rotation="0 135 0"></a-entity>
+	<a-entity id="playerDeathSplash5" mixin="playerSplash" rotation="0 180 0"></a-entity>
+	<a-entity id="playerDeathSplash6" mixin="playerSplash" rotation="0 225 0"></a-entity>
+	<a-entity id="playerDeathSplash7" mixin="playerSplash" rotation="0 270 0"></a-entity>
+	<a-entity id="playerDeathSplash8" mixin="playerSplash" rotation="0 315 0"></a-entity>
+	</a-cylinder>
+
+</a-entity>
+
+<!-- - - - - - - - - - - Ghost1 - - - - - - - - - - -->
+<a-entity id="ghost1OnBoard"
+position="0 -0.1 -1" rotation="-90 0 0" scale="0.9 0.9 0.9"
+>
+<a-entity id="ghost1Eye1Socket" mixin="ghostEyeSocket ghostEyeSocket1 ghostWhite ghostChangeWhiteToBlue ghostBlueTimer"
+><a-entity id="ghost1Eye1" mixin="ghostEye ghostBlue ghostChangeBlueToWhite"></a-entity>
+</a-entity>
+<a-entity id="ghost1Eye2Socket" mixin="ghostEyeSocket ghostEyeSocket2 ghostWhite ghostChangeWhiteToBlue ghostBlueTimer"
+><a-entity id="ghost1Eye2" mixin="ghostEye ghostBlue ghostChangeBlueToWhite"></a-entity>
+</a-entity>
+<a-entity id="ghost1Mouth" mixin="quezyMouth"></a-entity>
+<a-entity id="ghost1Spin" mixin="ghostSpin">
+	<a-entity id="ghost1Head" mixin="ghostHead ghostRed ghostBlueTimer"></a-entity>
+	<a-entity id="ghost1Body" mixin="ghostBody ghostRed ghostBlueTimer"></a-entity>
+	<a-entity id="ghost1Legs1" mixin="ghostLeg1 ghostRed ghostBlueTimer"></a-entity>
+	<a-entity id="ghost1Legs2" mixin="ghostLeg2 ghostRed ghostBlueTimer"></a-entity>
+	<a-entity id="ghost1Legs3" mixin="ghostLeg3 ghostRed ghostBlueTimer"></a-entity>
+	<a-entity id="ghost1Legs4" mixin="ghostLeg4 ghostRed ghostBlueTimer"></a-entity>
+</a-entity>
+</a-entity>
+
+<!-- - - - - - - - - - - Ghost2 - - - - - - - - - - -->
+<a-entity id="ghost2OnBoard"
+position="1 -0.1 -1" rotation="-90 0 0" scale="0.9 0.9 0.9"
+>
+<a-entity id="ghost2Eye1Socket" mixin="ghostEyeSocket ghostEyeSocket1 ghostWhite ghostChangeWhiteToBlue ghostBlueTimer"
+><a-entity id="ghost2Eye1" mixin="ghostEye ghostBlue ghostChangeBlueToWhite"></a-entity>
+</a-entity>
+<a-entity id="ghost2Eye2Socket" mixin="ghostEyeSocket ghostEyeSocket2 ghostWhite ghostChangeWhiteToBlue ghostBlueTimer"
+><a-entity id="ghost2Eye2" mixin="ghostEye ghostBlue ghostChangeBlueToWhite"></a-entity>
+</a-entity>
+<a-entity id="ghost2Mouth" mixin="quezyMouth"></a-entity>
+<a-entity id="ghost2Spin" mixin="ghostSpin">
+	<a-entity id="ghost2Head" mixin="ghostHead ghostPink ghostBlueTimer"></a-entity>
+	<a-entity id="ghost2Body" mixin="ghostBody ghostPink ghostBlueTimer"></a-entity>
+	<a-entity id="ghost2Legs1" mixin="ghostLeg1 ghostPink ghostBlueTimer"></a-entity>
+	<a-entity id="ghost2Legs2" mixin="ghostLeg2 ghostPink ghostBlueTimer"></a-entity>
+	<a-entity id="ghost2Legs3" mixin="ghostLeg3 ghostPink ghostBlueTimer"></a-entity>
+	<a-entity id="ghost2Legs4" mixin="ghostLeg4 ghostPink ghostBlueTimer"></a-entity>
+</a-entity>
+</a-entity>
+<!-- - - - - - - - - - - Ghost3 - - - - - - - - - - -->
+<a-entity id="ghost3OnBoard"
+position="0 -0.1 0" rotation="-90 0 0" scale="0.9 0.9 0.9"
+>
+<a-entity id="ghost3Eye1Socket" mixin="ghostEyeSocket ghostEyeSocket1 ghostWhite ghostChangeWhiteToBlue ghostBlueTimer"
+><a-entity id="ghost3Eye1" mixin="ghostEye ghostBlue ghostChangeBlueToWhite"></a-entity>
+</a-entity>
+<a-entity id="ghost3Eye2Socket" mixin="ghostEyeSocket ghostEyeSocket2 ghostWhite ghostChangeWhiteToBlue ghostBlueTimer"
+><a-entity id="ghost3Eye2" mixin="ghostEye ghostBlue ghostChangeBlueToWhite"></a-entity>
+</a-entity>
+<a-entity id="ghost3Mouth" mixin="quezyMouth"></a-entity>
+<a-entity id="ghost3Spin" mixin="ghostSpin">
+	<a-entity id="ghost3Head" mixin="ghostHead ghostTeal ghostBlueTimer"></a-entity>
+	<a-entity id="ghost3Body" mixin="ghostBody ghostTeal ghostBlueTimer"></a-entity>
+	<a-entity id="ghost3Legs1" mixin="ghostLeg1 ghostTeal ghostBlueTimer"></a-entity>
+	<a-entity id="ghost3Legs2" mixin="ghostLeg2 ghostTeal ghostBlueTimer"></a-entity>
+	<a-entity id="ghost3Legs3" mixin="ghostLeg3 ghostTeal ghostBlueTimer"></a-entity>
+	<a-entity id="ghost3Legs4" mixin="ghostLeg4 ghostTeal ghostBlueTimer"></a-entity>
+</a-entity>
+</a-entity>
+<!-- - - - - - - - - - - Ghost4 - - - - - - - - - - -->
+<a-entity id="ghost4OnBoard"
+position="1 -0.1 0" rotation="-90 0 0" scale="0.9 0.9 0.9"
+>
+<a-entity id="ghost4Eye1Socket" mixin="ghostEyeSocket ghostEyeSocket1 ghostWhite ghostChangeWhiteToBlue ghostBlueTimer"
+><a-entity id="ghost4Eye1" mixin="ghostEye ghostBlue ghostChangeBlueToWhite"></a-entity>
+</a-entity>
+<a-entity id="ghost4Eye2Socket" mixin="ghostEyeSocket ghostEyeSocket2 ghostWhite ghostChangeWhiteToBlue ghostBlueTimer"
+><a-entity id="ghost4Eye2" mixin="ghostEye ghostBlue ghostChangeBlueToWhite"></a-entity>
+</a-entity>
+<a-entity id="ghost4Mouth" mixin="quezyMouth"></a-entity>
+<a-entity id="ghost4Spin" mixin="ghostSpin">
+	<a-entity id="ghost4Head" mixin="ghostHead ghostOrange ghostBlueTimer"></a-entity>
+	<a-entity id="ghost4Body" mixin="ghostBody ghostOrange ghostBlueTimer"></a-entity>
+	<a-entity id="ghost4Legs1" mixin="ghostLeg1 ghostOrange ghostBlueTimer"></a-entity>
+	<a-entity id="ghost4Legs2" mixin="ghostLeg2 ghostOrange ghostBlueTimer"></a-entity>
+	<a-entity id="ghost4Legs3" mixin="ghostLeg3 ghostOrange ghostBlueTimer"></a-entity>
+	<a-entity id="ghost4Legs4" mixin="ghostLeg4 ghostOrange ghostBlueTimer"></a-entity>
+</a-entity>
+</a-entity>
+<!-- - - - - - - - - - - Camera - - - - - - - - - - -->
+<a-entity id="cameraWrapper"
+rotation="-90 0 0"
+position="0.5 11 -0.75"
+>
+<a-entity id="camera" 
+rotation="0 0 0"
+position="0 0 0"
+camera="
+active: true;
+near: 0.005;
+far: 1000;
+fov: 80;
+spectator: false;
+zoom: 1;"
+look-controls="enabled: false"
+
+animation__testingRotationReader1="property: object3D.rotation.x; from: -30; to: 30; dur: 10000; delay: 0; loop: true; dir: alternate; easing: linear; elasticity: 400; autoplay: false; enabled: true;"
+
+animation__testingRotationReader2="property: object3D.rotation.z; from: -30; to: 30; dur: 7000; delay: 0; loop: true; dir: alternate; easing: linear; elasticity: 400; autoplay: false; enabled: true;"
+></a-entity>
+
+<!-- Restart Game UI -->
+<a-entity id="vrRestartGamePrompt" class="clickable" visible="false"
+scale="0.5 0.5 0.5"
+geometry="primitive: plane; width: 0.25; height: 0.1;"
+position="0 -0.005 -0.25" rotation="0 0 0"
+material="color: #ac2d2d; shader: flat; opacity: 0.69; side: double"
+text="value: Restart Game; color: white; align: center; width:0.5"
+></a-entity>
+
+<!-- Controller -->
+<a-entity id="vrController" visible="false"
+laser-controls=""
+raycaster="enabled: true; lineColor: red; lineOpacity: 0; showLine: false; objects: .clickable; "
+cursor=""
+></a-entity>
+
+<!-- Floor -->
+<a-circle id="vrFloor" visible="false"
+rotation="-90 0 0" radius="0.5" position="0 -0.8 0"
+material="shader: flat; color: #e84db2; side: both; opacity: 0.25"
+></a-circle> 
+
+<!-- Audio -->
+<a-entity id="introSound"></a-entity>
+<a-entity id="levelCompleteSound"></a-entity>
+<a-entity id="deathSound"></a-entity>
+<a-entity id="eatFruitSound"></a-entity>
+<a-entity id="eatGhostSound"></a-entity>
+<a-entity id="extraLifeSound"></a-entity>
+<a-entity id="dotHitSound"></a-entity>
+<a-entity id="powerUpSound"></a-entity>
+
+</a-entity>
+<!-- - - - - - - - - - - Lights - - - - - - - - - - -->
+<!-- Lights -->
+<!-- Directional -->
+<a-entity id="directionalLight"
+light="type: directional; intensity: 0.5; castShadow: false" position="-0.5 0.65 0.25"
+></a-entity> 
+<!-- Ambient -->
+<a-entity id="ambientLight"
+light="type: ambient; color: #ba88af; intensity: 0.5"
+></a-entity>
+
+<!-- A-Frame Scene -->
+</a-scene>
+<!-- End A-Frame Div -->
+</div>
+
+<!-- - - - - - - - - - - Controller HTML - - - - - - - - - - -->
+
+<div id="controllerMask">
+<div id="controllerBlock">
+
+<!-- Directional Buttons -->
+<!-- Column 1 -->
+
+<div id="directional-buttons" class="column col1">
+<!-- Row 1 -->
+<div id="" class="directions column">
+<!-- Up -->
+<button id="upButton" class="directionButtons row up"></button>
+<!-- Left -->
+<button id="leftButton" class="directionButtons row left"></button>
+</div>
+<!-- Row 2 -->
+<div id="" class="directions column">
+<!-- Right -->
+<button id="rightButton" class="directionButtons row right"></button>
+<!-- Down -->
+<button id="downButton" class="directionButtons row down"></button>
+</div>
+
+<!-- End Directional Buttons -->
+</div>
+
+<!-- End Controller -->
+</div>
+</div>
+
+<!-- End A-Frame and Controller -->
+</div>
+
+<!-- - - - - - - - - - - Template Support - - - - - - - - - - -->
+<!--
+Phantom by HTML5 UP
+html5up.net | @ajlkn
+Free for personal and commercial use under the CCA 3.0 license (html5up.net/license) Scripts -->
+<script src="assets/js/jquery.min.js"></script>
+<script src="assets/js/browser.min.js"></script>
+<script src="assets/js/breakpoints.min.js"></script>
+<script src="assets/js/util.js"></script>
+<script src="assets/js/main.js"></script>
+
+<!-- - - - - - - - - - - HTML END - - - - - - - - - - -->
+<!-- End Body -->
+</body>
+<!-- End HTML -->
+</html>
