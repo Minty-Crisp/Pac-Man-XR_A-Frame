@@ -11,7 +11,7 @@ How to Play :
 Ways to Play :
 - Desktop - Keyboard (WASD) (Arrows)
 - Desktop - Mouse Hover w/ X Controller
-- Mobile - Tab w/ X Controller
+- Mobile - Tap w/ X Controller
 - VR - 3DoF Joystick Controller
 ---
 Using only aframe.js, all graphics, animations and controls are built from within the webxr framework. Allowing this 1 game to played in a variety of ways including an immersive large screen version in VR with classic Joystick like controls. Not all elements match the original perfectly and some need a bit of improvement like even more diverse ai, better collision and the unique Pac-Man turning radius. Working on more accurate designs to improve those systems in the future for a more authentic experience. The amount of overall entities as well are pretty high (about 800), but brainstorming ways to optimize further while keeping the customizable nature of the system intact.
