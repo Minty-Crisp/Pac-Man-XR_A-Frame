@@ -9861,6 +9861,9 @@ dotSpawner(mapBasicDots);
 //Basic Map loaded
 levelLoaded = true;
 
+//Google Chrome fix to avoid inspector camera from taking over
+camera.setAttribute('camera',{active: true})
+
 },//End Init
 
 });//End Player Movement Component
