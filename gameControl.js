@@ -178,6 +178,7 @@ let playerNewRotation = new THREE.Vector3();
 let playerCurrentDirection;
 //Main
 const stepDistance = 0.5;
+let playerDead = false;
 let stepIntervalPlayer;//ms
 let moveAnimation = {};
 let inputDirection;
@@ -2803,7 +2804,7 @@ function newGameStart(){
 
 	//Make sure Game Over is turned off
 	gameOverText.setAttribute('visible',false);
-
+	playerDead = false;
 	countdownText = {value:5, width: 20, color: "#FFFFFF", align: "center", font: "exo2bold"};
 	//Reset Points
 	playerScore = 0;
@@ -2891,7 +2892,7 @@ function levelRestarter(){
 	gameStart = false;
 	levelRestart = false;
 	countdownText = {value:5, width: 20, color: "#FFFFFF", align: "center", font: "exo2bold"};
-
+	playerDead = false;
 	//Start Countdown Sequence
 	gameStartTimer(5);
 
@@ -2907,6 +2908,7 @@ function nextLevelStart(){
 	levelRestart = false;
 	gameStart = false;
 
+	playerDead = false;
 	countdownText = {value:5, width: 20, color: "#FFFFFF", align: "center", font: "exo2bold"};
 	//Update Level
 	currentLevel++;
@@ -4264,7 +4266,9 @@ if(ghost1Hit){} else {
 			ghostDeath('ghost1');
 		} else {
 			playerHit = true;
-			playerDeath();
+			if(playerDead){}else{
+				playerDeath();
+			}
 		}
 	}
 }
@@ -4276,7 +4280,9 @@ if(ghost2Hit){} else {
 			ghostDeath('ghost2');
 		} else {
 			playerHit = true;
-			playerDeath();
+			if(playerDead){}else{
+				playerDeath();
+			}
 		}
 	}
 }
@@ -4288,7 +4294,9 @@ if(ghost3Hit){} else {
 			ghostDeath('ghost3');
 		} else {
 			playerHit = true;
-			playerDeath();
+			if(playerDead){}else{
+				playerDeath();
+			}
 		}
 	}
 }
@@ -4301,7 +4309,9 @@ if(ghost4Hit){} else {
 			ghostDeath('ghost4');
 		} else {
 			playerHit = true;
-			playerDeath();
+			if(playerDead){}else{
+				playerDeath();
+			}
 		}
 	}
 }
@@ -4871,6 +4881,8 @@ playerInterval = setInterval(function() {
 function playerDeath(){
 	//Pause All Movements and Collision
 	clearMovements();
+	//Prevent additional playerDeath()'s from running
+	playerDead = true;
 	//Level is no longer running
 	levelStart = false;
 	//Update lives
@@ -9675,17 +9687,23 @@ enableAudioButtonHTML2.addEventListener('click', toggleAudio);
 //Mouse / Tap
 //The mouse/tap events will fire only once and need their own interval function to keep hitting that faster than stepIntervalPlayer
 //once the user lets of, stop checking
+//
+//Added touchmove to allow mobile swiping into button area
 
 if(sceneEl.isMobile){
 	//console.log('Mobile True');
 
 	upButton.addEventListener('touchstart', upButtonHit);
+	upButton.addEventListener('touchmove', upButtonHit);
 	upButton.addEventListener('touchend', buttonClear);
 	leftButton.addEventListener('touchstart', leftButtonHit);
+	leftButton.addEventListener('touchmove', leftButtonHit);
 	leftButton.addEventListener('touchend', buttonClear);
 	rightButton.addEventListener('touchstart', rightButtonHit);
+	rightButton.addEventListener('touchmove', rightButtonHit);
 	rightButton.addEventListener('touchend', buttonClear);
 	downButton.addEventListener('touchstart', downButtonHit);
+	downButton.addEventListener('touchmove', downButtonHit);
 	downButton.addEventListener('touchend', buttonClear);
 	document.addEventListener('touchstart', clickToRestartGame);
 
@@ -9758,85 +9776,52 @@ document.body.addEventListener('keyup', function (e) {
 //VR
 //
 
-//Sync VR controller to Up,Right,Down,Left controls
-function vrControllerUpdate(){
-
-	//Read rotation of VR Controller
-	vrControllerRot = vrController.object3D.rotation;
-	//Activate XZ up,right,down,left when the X or Z value is greater than the other
-
-	//Deadzone
-	//X : 0.08 to -0.08
-	//Z : 0.08 to -0.08
-
-	//X is up down movement
-	//Up is -
-	//Down is +
-
-	//Z is left right twist movement
-	//Left is +
-	//Right is -
-
-	if(Math.abs(vrControllerRot.x) > Math.abs(vrControllerRot.z)){
-		if(vrControllerRot.x >= 0.08){
-			buttonClear();
-			downButtonHit();
-		} else if (vrControllerRot.x <= -0.08){
-			buttonClear();
-			upButtonHit();
-		} else {
-			buttonClear();
-		}
-	} else {
-		if(vrControllerRot.z >= 0.08){
-			buttonClear();
-			leftButtonHit();
-		} else if (vrControllerRot.z <= -0.08){
-			buttonClear();
-			rightButtonHit();
-		} else {
-			buttonClear();
-		}
-	}
-
-};
-
-//startGhost4Interval
-function startVRControllerInterval(interval) {
-
-vrControllerInterval = setInterval(function() {
-
-	vrControllerUpdate();
-
-}, interval);//Interval
-
-}//End startGhost4Interval
-
+//VR On
 document.addEventListener('enter-vr', function(){
 	//console.log('VR Mode On');
 	camera.setAttribute('look-controls',{enabled: true});
 	vrController.setAttribute('visible', true);
 	vrFloor.setAttribute('visible', true);
-	startVRControllerInterval(50);
 	useVRRestartPrompt = true;
 	//Game Restart VR Button
 	vrRestartGamePrompt.addEventListener('click', newGameStart);
 	//Toggle Audio
 	toggleAudio();
+	//Joystick Controller
+	vrController.addEventListener('thumbstickmoved', function (e) {
+		if (e.detail.y > 0.95) { 
+			buttonClear();
+			downButtonHit();
+		}
+		if (e.detail.y < -0.95) { 
+			buttonClear();
+			upButtonHit();
+		}
+		if (e.detail.x < -0.95) { 
+			buttonClear();
+			leftButtonHit();
+		}
+		if (e.detail.x > 0.95) { 
+			buttonClear();
+			rightButtonHit();
+		}
+	});
 });
 
+//VR Off
 document.addEventListener('exit-vr', function(){
 	//console.log('VR Mode Off');
 	camera.setAttribute('look-controls',{enabled: false});
 	vrController.setAttribute('visible', false);
 	vrFloor.setAttribute('visible', false);
-	clearInterval(vrControllerInterval);
 	useVRRestartPrompt = false;
 	camera.setAttribute('rotation', '0 0 0');
 	//Game Restart VR Button
 	vrRestartGamePrompt.removeEventListener('click', newGameStart);
 	//Toggle Audio
 	//toggleAudio();
+	//Joystick Controller
+	vrController.removeEventListener('thumbstickmoved');
 });
 
 enableVRHTML.addEventListener('click', function(){
