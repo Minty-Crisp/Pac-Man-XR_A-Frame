@@ -9687,23 +9687,17 @@ enableAudioButtonHTML2.addEventListener('click', toggleAudio);
 //Mouse / Tap
 //The mouse/tap events will fire only once and need their own interval function to keep hitting that faster than stepIntervalPlayer
 //once the user lets of, stop checking
-//
-//Added touchmove to allow mobile swiping into button area
 
 if(sceneEl.isMobile){
 	//console.log('Mobile True');
 
 	upButton.addEventListener('touchstart', upButtonHit);
-	upButton.addEventListener('touchmove', upButtonHit);
 	upButton.addEventListener('touchend', buttonClear);
 	leftButton.addEventListener('touchstart', leftButtonHit);
-	leftButton.addEventListener('touchmove', leftButtonHit);
 	leftButton.addEventListener('touchend', buttonClear);
 	rightButton.addEventListener('touchstart', rightButtonHit);
-	rightButton.addEventListener('touchmove', rightButtonHit);
 	rightButton.addEventListener('touchend', buttonClear);
 	downButton.addEventListener('touchstart', downButtonHit);
-	downButton.addEventListener('touchmove', downButtonHit);
 	downButton.addEventListener('touchend', buttonClear);
 	document.addEventListener('touchstart', clickToRestartGame);
 
