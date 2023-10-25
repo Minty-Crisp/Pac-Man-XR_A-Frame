@@ -21,12 +21,17 @@ Another interesting tidbit about the system is that the map and dot creator are 
 ---
 This is my first huge project as I am still learning the ways of Web Development and Web XR, so please be kind when reviewing or sharing. Otherwise, I hope you enjoy the game and thank you for taking a look.
 
-- If you want to see more work of mine playing with A-Frame, check out my site [mintycrisp.com](https://mintycrisp.com).
-- You can also check me out on a few other places like [twitter](https://twitter.com/minty_crisp), [dev.to](https://dev.to/mintycrisp) and where I spend most of my free time [reddit](https://www.reddit.com/user/Minty-Crisp/).
-- I am available for Web XR work if you are interested in hiring me or collaborating on future projects.
-- You can reach me via socials or email : minty-crisp @ proton . me
-- If you really enjoy my work and want to support me making more of these types of projects, you can help me out with a [kofi](https://ko-fi.com/mintycrisp) or just by sharing the game.
-- ^-^ Minty Crisp :watermelon: 
 ---
 - Original game and sounds by Namco
 - Dot and PowerUp hit sounds by LittleRobotSoundFactory (https://freesound.org/people/LittleRobotSoundFactory/)
+
+---
+# Minty Crisp ^-^ :watermelon: 
+
+- If you want to see more work of mine playing with A-Frame, check out my site [mintycrisp.com](https://mintycrisp.com) and my [Itch Store](https://mintycrisp.itch.io/).
+- You may also be interested in an arcade I built using AUXL as it's foundation filled with XR mini games called [Minty's XRcade](https://mintyxr.com).
+- I also am building an engine that powers Minty's XRcade called A-Frame UX Library [AUXL Repo](https://github.com/Minty-Crisp/AUXL).
+- You can also check me out on a few other places like [Mastodon](https://mastodon.social/@mintycrisp) or [dev.to](https://dev.to/mintycrisp).
+- I am available for Web XR work if you are interested in hiring me or collaborating on future projects.
+- You can reach me via socials or email : minty-crisp @ proton . me
+- If you really enjoy my work and want to support me making more of these types of projects, you can help me out with any kind of donation at [ko-fi](https://ko-fi.com/mintycrisp) or just by sharing my work.
